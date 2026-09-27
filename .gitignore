@@ -1,0 +1,9 @@
+# MLflow
+mlruns/
+mlflow.db
+artifacts/
+mlartifacts/
+confusion_matrix_*.png
+
+# Feast local cache
+_feast/
