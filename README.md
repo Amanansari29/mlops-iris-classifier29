@@ -50,7 +50,7 @@ $env:MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
 # Git Bash
 export MLFLOW_TRACKING_URI=http://127.0.0.1:5000
 
-python src/train_with_mlflow.py
+python train_with_mlflow.py
 ```
 
 Open <http://127.0.0.1:5000> to compare the runs, metrics, confusion-matrix
@@ -61,12 +61,9 @@ history is retained.
 Register the highest-F1 run and load the staged model:
 
 ```bash
-# Run from the repository root
+# Run these commands from the repository root
 python register_best_model.py
-
-# The original script path also works
-python src/register_best_model.py
-python src/load_registered_model.py
+python load_registered_model.py
 ```
 
 The training script uses a fixed, stratified 80/20 holdout split. With the
