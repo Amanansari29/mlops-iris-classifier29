@@ -21,6 +21,7 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from mlflow.models import infer_signature
 
 
 DATA_PATH = Path("data/processed/iris_features.csv")
@@ -90,7 +91,13 @@ def train_and_log_model(model_name: str, model, X_train, X_test, y_train, y_test
         mlflow.log_metrics(metrics)
         model_artifact_path = log_confusion_matrix(model_name, y_test, predictions, labels)
         mlflow.log_artifact(model_artifact_path)
-        mlflow.sklearn.log_model(model, artifact_path="model")
+        signature = infer_signature(X_train, model.predict(X_train))
+        mlflow.sklearn.log_model(
+            model,
+            artifact_path="model",
+            signature=signature,
+            input_example=X_train.head(5),
+        )
         print(f"\nRun: {run.info.run_id}")
         print(f"Model: {model_name}")
         print(metrics)
