@@ -61,6 +61,10 @@ history is retained.
 Register the highest-F1 run and load the staged model:
 
 ```bash
+# Run from the repository root
+python register_best_model.py
+
+# The original script path also works
 python src/register_best_model.py
 python src/load_registered_model.py
 ```
