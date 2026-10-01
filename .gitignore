@@ -1,6 +1,7 @@
 # MLflow
 mlruns/
 mlflow.db
+mlflow-tracking/
 artifacts/
 mlartifacts/
 confusion_matrix_*.png

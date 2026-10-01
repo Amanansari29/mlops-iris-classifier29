@@ -37,8 +37,13 @@ dvc repro
 Start the MLflow tracking server in one terminal:
 
 ```bash
-mlflow ui --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 5000
+mlflow ui --backend-store-uri ./mlflow-tracking --host 127.0.0.1 --port 5000
 ```
+
+The `mlflow-tracking/` directory holds the local experiment metadata and
+artifacts. Keep it separate from `mlruns/`, which may contain artifacts from
+older runs; using `mlruns/` as the backend store can make MLflow report
+malformed experiments when those artifact directories lack `meta.yaml`.
 
 In a second terminal, activate the same environment, configure the tracking
 URI, and run all three model experiments:
