@@ -83,3 +83,23 @@ repository's current 149-row feature dataset, the measured macro F1 scores are:
 The scripts select and register the actual highest-scoring run; they do not
 force a particular model to win. Rankings can change if the input data or
 evaluation procedure changes.
+
+## Hyperparameter tuning experiment
+
+With the feature dataset available and the MLflow server running, point the
+scripts to the same server and run the baseline, both searches, and comparison:
+
+```bash
+# Git Bash (use the port configured for your MLflow server)
+export MLFLOW_TRACKING_URI=http://127.0.0.1:5000
+
+python src/baseline_model.py
+python src/grid_search_tuning.py
+python src/random_search_tuning.py
+python src/compare_tuning_results.py
+```
+
+The search scripts save their ranked candidate tables in the repository root
+and attach them to their MLflow runs. See
+[docs/HYPERPARAMETER_TUNING_ANALYSIS.md](docs/HYPERPARAMETER_TUNING_ANALYSIS.md)
+for search details and measured results.
