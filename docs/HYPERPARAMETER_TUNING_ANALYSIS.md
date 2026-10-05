@@ -64,28 +64,4 @@ python src/compare_tuning_results.py
 The search candidate CSVs are written to the repository root as well as logged
 as MLflow artifacts.
 
-## Viva-voce questions
 
-### 1. Why establish a baseline before tuning?
-
-A baseline provides a reference for whether added model complexity and
-optimization actually improve the result. If a tuned Random Forest scores
-worse than the simpler Decision Tree, investigate the features, evaluation
-setup, search space, and possible overfitting rather than assuming complexity
-is beneficial.
-
-### 2. Why can Random Search perform similarly with fewer fits?
-
-Usually only some hyperparameters strongly affect the score. Grid Search
-spends evaluations on every value in every dimension, while Random Search
-samples combinations and can explore the influential dimensions efficiently.
-Grid Search is useful when the space is small, exhaustive reproducibility is
-required, or interactions warrant evaluating every combination.
-
-### 3. Why not use the test set to pick hyperparameters?
-
-Selecting configurations based on the test set leaks information from that
-set into model selection. The best score then becomes optimistically biased
-because the search may select a configuration that fits test-set noise.
-Cross-validation on the training set is used for selection; the held-out test
-set is reserved for final evaluation.
