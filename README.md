@@ -103,3 +103,17 @@ The search scripts save their ranked candidate tables in the repository root
 and attach them to their MLflow runs. See
 [docs/HYPERPARAMETER_TUNING_ANALYSIS.md](docs/HYPERPARAMETER_TUNING_ANALYSIS.md)
 for search details and measured results.
+
+## Tests
+
+Install the project dependencies, then run the complete test suite with coverage
+and a JUnit-compatible report:
+
+```bash
+python -m pytest --cov=src --cov-report=term-missing --junitxml=test-results.xml
+```
+
+The suite covers data preprocessing, feature engineering, data validation,
+training smoke tests, and a model-quality gate. See
+[docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for test coverage and
+execution details.
