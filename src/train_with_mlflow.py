@@ -4,14 +4,15 @@ import os
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import mlflow
-import mlflow.sklearn
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
+import matplotlib.pyplot as plt  # noqa: E402
+import mlflow  # noqa: E402
+import mlflow.sklearn  # noqa: E402
+import pandas as pd  # noqa: E402
+from sklearn.ensemble import RandomForestClassifier  # noqa: E402
+from sklearn.linear_model import LogisticRegression  # noqa: E402
+from sklearn.metrics import (  # noqa: E402
     accuracy_score,
     confusion_matrix,
     f1_score,
@@ -19,9 +20,9 @@ from sklearn.metrics import (
     recall_score,
     ConfusionMatrixDisplay,
 )
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from mlflow.models import infer_signature
+from sklearn.model_selection import train_test_split  # noqa: E402
+from sklearn.preprocessing import LabelEncoder  # noqa: E402
+from mlflow.models import infer_signature  # noqa: E402
 
 
 DATA_PATH = Path("data/processed/iris_features.csv")

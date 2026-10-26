@@ -8,6 +8,7 @@ confusion_matrix_*.png
 
 # Test reports and coverage output
 .coverage
+coverage.xml
 htmlcov/
 test-results.xml
 __pycache__/

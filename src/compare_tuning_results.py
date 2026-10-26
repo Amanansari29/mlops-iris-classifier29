@@ -1,6 +1,5 @@
 """Compare the baseline, grid-search, and random-search MLflow runs."""
 
-import mlflow
 import pandas as pd
 from mlflow.tracking import MlflowClient
 

@@ -16,6 +16,7 @@ NUMERIC_COLS = [
     "petal length (cm)", "petal width (cm)",
 ]
 
+
 def preprocess(input_path: str, output_path: str) -> pd.DataFrame:
     df = pd.read_csv(input_path)
     initial_rows = len(df)
@@ -31,7 +32,12 @@ def preprocess(input_path: str, output_path: str) -> pd.DataFrame:
         if n_missing > 0:
             median_val = df[col].median()
             df[col] = df[col].fillna(median_val)
-            logger.info("Imputed %d missing values in '%s' with median=%.3f", n_missing, col, median_val)
+            logger.info(
+                "Imputed %d missing values in '%s' with median=%.3f",
+                n_missing,
+                col,
+                median_val,
+            )
 
     # Drop rows with unresolvable missing target
     df = df.dropna(subset=["species"])
@@ -48,4 +54,3 @@ if __name__ == "__main__":
     parser.add_argument("--output", default="data/processed/iris_preprocessed.csv")
     args = parser.parse_args()
     preprocess(args.input, args.output)
-    # Step 4: Feature Engineering Stage: add this code to features.py

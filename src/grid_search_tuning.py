@@ -1,7 +1,6 @@
 """Exhaustively tune a Random Forest over a fixed hyperparameter grid."""
 
 import json
-import tempfile
 from pathlib import Path
 
 import mlflow

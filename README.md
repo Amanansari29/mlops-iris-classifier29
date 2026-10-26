@@ -117,3 +117,11 @@ The suite covers data preprocessing, feature engineering, data validation,
 training smoke tests, and a model-quality gate. See
 [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for test coverage and
 execution details.
+
+## Continuous integration
+
+GitHub Actions runs compilation and lint checks, the test suite with coverage
+reports, and a dedicated model-quality check on pushes and pull requests
+targeting `main` or `develop`. See
+[docs/CI_PIPELINE.md](docs/CI_PIPELINE.md) for workflow details and the
+repository settings needed to require these checks before merging.

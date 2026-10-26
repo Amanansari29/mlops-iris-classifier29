@@ -48,6 +48,8 @@ def engineer_features(input_path: str, output_path: str) -> pd.DataFrame:
     logger.info("Engineered %d features -> %s", df.shape[1], output_path)
 
     return df
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
