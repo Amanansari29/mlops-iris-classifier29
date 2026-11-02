@@ -121,7 +121,24 @@ execution details.
 ## Continuous integration
 
 GitHub Actions runs compilation and lint checks, the test suite with coverage
-reports, and a dedicated model-quality check on pushes and pull requests
-targeting `main` or `develop`. See
+reports, a dedicated model-quality check, and a container build/API smoke test
+on pushes and pull requests targeting `main` or `develop`. See
 [docs/CI_PIPELINE.md](docs/CI_PIPELINE.md) for workflow details and the
 repository settings needed to require these checks before merging.
+
+## Docker deployment
+
+The multi-stage [Dockerfile](Dockerfile) generates the Iris features and trains
+the serving model during the image build, so the build does not depend on
+locally generated or Git-ignored data artifacts. Build and run the local API:
+
+```bash
+docker build -t iris-classifier:v1 .
+docker run --rm --name iris-classifier-container \
+  -p 127.0.0.1:8000:8000 iris-classifier:v1
+```
+
+The API health endpoint is `http://localhost:8000/health`; prediction requests
+are sent as JSON to `http://localhost:8000/predict`. See
+[docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for payloads, validation,
+image inspection, and cleanup.

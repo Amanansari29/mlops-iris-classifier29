@@ -123,3 +123,95 @@ jobs:
 
       - name: Validate model quality
         run: python -m pytest tests/test_model_quality.py -v
+
+  container-smoke:
+    name: container-smoke
+    needs: [test-suite, model-quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        run: docker build --tag iris-classifier:v1 .
+
+      - name: Build single-stage size comparison
+        run: |
+          docker build \
+            --file Dockerfile.single-stage \
+            --tag iris-classifier:single-stage .
+          docker image ls iris-classifier
+
+      - name: Start container and test API
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --detach --rm \
+            --name iris-classifier-smoke \
+            --publish 127.0.0.1:8000:8000 \
+            iris-classifier:v1
+          cleanup() {
+            docker stop iris-classifier-smoke >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 30); do
+            health=$(docker inspect \
+              --format='{{.State.Health.Status}}' \
+              iris-classifier-smoke 2>/dev/null || true)
+            if [ "$health" = "healthy" ]; then
+              break
+            fi
+            if [ "$health" = "unhealthy" ]; then
+              docker logs iris-classifier-smoke
+              exit 1
+            fi
+            sleep 2
+          done
+          test "$health" = "healthy"
+
+          python - <<'PY'
+          import json
+          from urllib.error import HTTPError
+          from urllib.request import Request, urlopen
+
+          base_url = "http://127.0.0.1:8000"
+          with urlopen(f"{base_url}/health", timeout=5) as response:
+              assert response.status == 200
+              assert json.load(response) == {"status": "healthy"}
+
+          payload = {
+              "sepal length (cm)": 5.1,
+              "sepal width (cm)": 3.5,
+              "petal length (cm)": 1.4,
+              "petal width (cm)": 0.2,
+              "sepal_area": 17.85,
+              "petal_area": 0.28,
+              "sepal_to_petal_length_ratio": 5.1 / 1.4,
+          }
+          request = Request(
+              f"{base_url}/predict",
+              data=json.dumps(payload).encode(),
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          with urlopen(request, timeout=5) as response:
+              result = json.load(response)
+          assert result["prediction"] in {"setosa", "versicolor", "virginica"}
+          assert len(result["probabilities"]) == 3
+          assert abs(sum(result["probabilities"]) - 1.0) < 1e-6
+
+          invalid_request = Request(
+              f"{base_url}/predict",
+              data=b'{"sepal length (cm)": 5.1}',
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          try:
+              urlopen(invalid_request, timeout=5)
+          except HTTPError as error:
+              assert error.code == 400
+              assert json.load(error)["error"] == "Missing features"
+          else:
+              raise AssertionError("Expected HTTP 400 for missing features")
+          PY

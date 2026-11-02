@@ -1,0 +1,38 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements-serving.txt .
+RUN python -m pip install --no-cache-dir -r requirements-serving.txt
+
+COPY src/pipeline/ src/pipeline/
+COPY src/train_final_model.py src/train_final_model.py
+COPY src/serve.py src/serve.py
+
+RUN mkdir -p data/raw data/processed models \
+    && python src/pipeline/collect.py --output data/raw/iris_raw.csv \
+    && python src/pipeline/preprocess.py \
+        --input data/raw/iris_raw.csv \
+        --output data/processed/iris_preprocessed.csv \
+    && python src/pipeline/features.py \
+        --input data/processed/iris_preprocessed.csv \
+        --output data/processed/iris_features.csv \
+    && python src/pipeline/validate.py \
+        --input data/processed/iris_features.csv \
+    && python src/train_final_model.py
+
+ENV PYTHONUNBUFFERED=1 \
+    PORT=8000
+
+RUN groupadd --system app \
+    && useradd --system --gid app --home-dir /app app \
+    && chown -R app:app /app
+
+USER app
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+
+CMD ["python", "src/serve.py"]

@@ -7,10 +7,10 @@ uses Python 3.11 and caches pip downloads based on `requirements.txt`.
 
 ## Jobs
 
-The workflow runs three jobs in dependency order:
+The workflow runs four jobs in dependency order:
 
 ```text
-build-and-lint -> test-suite -> model-quality-gate
+build-and-lint -> test-suite -> model-quality-gate -> container-smoke
 ```
 
 ### `build-and-lint`
@@ -41,6 +41,14 @@ check on successful full-suite runs. If the quality assertion fails in
 `test-suite`, this job is skipped because of its `needs: test-suite` dependency;
 the failing test-suite check still blocks a merge when required.
 
+### `container-smoke`
+
+Runs after the test and model-quality jobs pass. It builds the multi-stage
+Docker image, starts a container bound to the runner's loopback interface,
+waits for the image health check, then checks the health response, a valid Iris
+prediction and its probabilities, and the HTTP 400 response for missing
+features. The job reports the built image size in the Actions log.
+
 ## Requiring checks before merging
 
 The workflow does not configure GitHub repository rules. To require CI before
@@ -49,8 +57,9 @@ protection rule in GitHub Settings targeting `main`:
 
 1. Require pull requests before merging.
 2. Require status checks to pass.
-3. Select the checks corresponding to `build-and-lint`, `test-suite`, and
-   `model-quality-gate` after GitHub has observed a completed workflow run.
+3. Select the checks corresponding to `build-and-lint`, `test-suite`,
+   `model-quality-gate`, and `container-smoke` after GitHub has observed a
+   completed workflow run.
 4. Optionally require the branch to be up to date before merging.
 
 The actual check labels are shown in the repository's settings after the
@@ -62,7 +71,7 @@ workflow.
 
 Push a change or open a pull request targeting `main` or `develop`, then inspect
 the **MLOps CI Pipeline** run in the GitHub Actions tab. A successful run should
-show all three jobs passing. Download the `test-and-coverage-reports` artifact
+show all four jobs passing. Download the `test-and-coverage-reports` artifact
 from the run summary to inspect `test-results.xml` and `coverage.xml`.
 
 To verify the model-quality assertion locally, temporarily raise

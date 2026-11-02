@@ -5,6 +5,7 @@ mlflow-tracking/
 artifacts/
 mlartifacts/
 confusion_matrix_*.png
+models/
 
 # Test reports and coverage output
 .coverage
